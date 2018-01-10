@@ -15,9 +15,7 @@ public class TerrainManager : MonoBehaviour {
 		player = GameObject.Find ("Player").transform;
 
 		// spawn initial chunks
-		for (int i = 0; i < 3; i++) {
-			ExpressNextChunk ();
-		}
+		ResetTerrain();
 	}
 	
 	void Update () {
@@ -28,6 +26,15 @@ public class TerrainManager : MonoBehaviour {
 			}
 
 			TestForObjectDespawns ();
+		}
+	}
+
+	public void ResetTerrain () {
+		ClearObjects ();
+		farthestX = 0f;
+		curChunkX = 0f;
+		for (int i = 0; i < 3; i++) {
+			ExpressNextChunk ();
 		}
 	}
 
@@ -48,15 +55,24 @@ public class TerrainManager : MonoBehaviour {
 		float despawnMargin = farthestX - objectDespawnDst;
 		List<int> indexesToRemove = new List<int> ();
 		for (int i = 0; i < activeObjects.Count; i++) {
-			if (activeObjects[i].transform.position.x < despawnMargin) {
-				Destroy (activeObjects[i]);
-				indexesToRemove.Add (i);
+			if (activeObjects [i] != null) {
+				if (activeObjects [i].transform.position.x < despawnMargin) {
+					Destroy (activeObjects [i]);
+					indexesToRemove.Add (i);
+				}
 			}
 		}
 		foreach (var index in indexesToRemove) {
 			activeObjects.RemoveAt (index);
 		}
 			
+	}
+
+	void ClearObjects () {
+		for (int i = 0; i < activeObjects.Count; i++) {
+			Destroy (activeObjects[i]);
+		}
+		activeObjects.Clear ();
 	}
 
 	[System.Serializable]

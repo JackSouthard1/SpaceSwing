@@ -186,4 +186,28 @@ public class PlayerController : MonoBehaviour {
 			return null;
 		}
 	}
+
+	void Explode () {
+		Reset ();
+	}
+
+	public void Caught () {
+		Reset ();
+	}
+
+	public void Reset () {
+		BreakChain ();
+		BreakPreview ();
+		transform.position = Vector3.zero;
+		rb.velocity = Vector2.zero;
+		GameObject.Find ("TerrainManager").GetComponent<TerrainManager> ().ResetTerrain ();
+		Camera.main.GetComponent<CameraController> ().ResetCamera ();
+		GameObject.Find ("Police").GetComponent<PoliceController> ().ResetPolice ();
+	}
+
+	void OnTriggerEnter2D (Collider2D coll) {
+		if (coll.tag == "DeathZone") {
+			Explode ();
+		}
+	}
 }

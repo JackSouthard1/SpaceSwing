@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour {
 		ResetCamera ();
 	}
 
-	void ResetCamera () {
+	public void ResetCamera () {
 		farthestX = 0f;
 	}
 	
