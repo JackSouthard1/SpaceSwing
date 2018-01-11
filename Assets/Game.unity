@@ -7212,6 +7212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce485ba3abe04f3a8118bea34e03e0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnTerrain: 1
   objectSpawnBuffer: 100
   objectDespawnDst: 100
   allLevelChunks:
@@ -7219,7 +7220,7 @@ MonoBehaviour:
     levelObjects:
     - pos: {x: 8, y: 17}
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
-    - pos: {x: 30, y: 8}
+    - pos: {x: 30, y: 0}
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
   - chunkSize: 110
     levelObjects:
@@ -7237,10 +7238,20 @@ MonoBehaviour:
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
     - pos: {x: 97, y: 26}
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+  - chunkSize: 110
+    levelObjects:
+    - pos: {x: 13, y: 12}
+      prefab: {fileID: 1362469663190346, guid: 8f4dad4edf6424010a5b67cdec57223c, type: 2}
+    - pos: {x: 38, y: 7}
+      prefab: {fileID: 1438276064303692, guid: b25a7c595bbee4679af46ad4132e6a0b, type: 2}
+    - pos: {x: 13, y: -22}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+    - pos: {x: 81, y: 23}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
   activeObjects: []
   starPrefab: {fileID: 1827894580059554, guid: 7d8c178f5044a437e85a8ffd712c57e8, type: 2}
   starSpawnIntervals: 1
-  initialStarCount: 100
+  initialStarCount: 300
 --- !u!4 &653718220
 Transform:
   m_ObjectHideFlags: 0
@@ -18172,7 +18183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playedCutscene: 1
-  shipSpeed: 15
+  shipSpeed: 20
   cutSceneLength: 7
   fuelGuageAppearDelay: 4
   policeStartOffset: 45

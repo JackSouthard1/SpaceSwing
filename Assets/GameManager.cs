@@ -19,6 +19,10 @@ public class GameManager : MonoBehaviour {
 	[HideInInspector]
 	public bool inCutscene = false;
 
+	bool awaitingReset = false;
+	float timeToResetScene = 2f;
+	float resetSceneStartTime;
+
 	Animation cutsceneExit;
 	PlayerController pc;
 	PoliceController police;
@@ -72,9 +76,17 @@ public class GameManager : MonoBehaviour {
 				pc.SputterEngines ();
 			}
 		}
+
+		if (awaitingReset) {
+			if (Time.time - resetSceneStartTime > timeToResetScene) {
+				awaitingReset = false;
+				SceneManager.LoadScene (0);
+			}
+		}
 	}
 
 	public void ResetGame () {
-		SceneManager.LoadScene (0);
+		awaitingReset = true;
+		resetSceneStartTime = Time.time;
 	}
 }

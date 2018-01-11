@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainManager : MonoBehaviour {
+	public bool spawnTerrain;
+
 	[Header("Chunks")]
 	public float objectSpawnBuffer;
 	public float objectDespawnDst;
@@ -30,8 +32,11 @@ public class TerrainManager : MonoBehaviour {
 	void Update () {
 		if (player.transform.position.x > farthestX) {
 			farthestX = player.transform.position.x;
-			if (farthestX + objectSpawnBuffer > curChunkX) {
-				ExpressNextChunk ();
+
+			if (spawnTerrain) {
+				if (farthestX + objectSpawnBuffer > curChunkX) {
+					ExpressNextChunk ();
+				}
 			}
 
 			if (farthestX + objectSpawnBuffer > farthestStarX) {
@@ -46,9 +51,12 @@ public class TerrainManager : MonoBehaviour {
 		ClearObjects ();
 		farthestX = 0f;
 		curChunkX = 0f;
-		farthestStarX = -50f;
-		for (int i = 0; i < 3; i++) {
-			ExpressNextChunk ();
+		farthestStarX = player.position.x - 50f;
+
+		if (spawnTerrain) {
+			for (int i = 0; i < 3; i++) {
+				ExpressNextChunk ();
+			}
 		}
 
 		for (int i = 0; i < initialStarCount; i++) {

@@ -65,6 +65,10 @@ public class Ship : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D (Collision2D coll) {
+		if (coll.gameObject.tag == "Deadly") {
+			Destroyed ();
+		}
+
 		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
 			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
 			if (rb.velocity.magnitude > breakSpeed) {

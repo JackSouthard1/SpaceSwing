@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour {
 	float boostTimeRemaining = 0f;
 	bool boosting = false;
 
+	bool dead = false;
+
 	Text boostPercentageText;
 	GameObject previewObject;
 	GameObject hookedObject;
@@ -59,6 +61,10 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void Update () {
+		if (dead) {
+			return;
+		}
+
 		if (gm.inCutscene) {
 			rb.velocity = Vector2.right * gm.shipSpeed;
 			return;
@@ -94,6 +100,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void LateUpdate () {
+		if (dead) {
+			return;
+		}
 		// rotation
 		if (rb.velocity.magnitude > 0.5f) {
 			Vector2 v = rb.velocity;
@@ -282,6 +291,8 @@ public class PlayerController : MonoBehaviour {
 		GameObject explosion = (GameObject)Instantiate (explosionPrefab);
 		explosion.transform.position = transform.position;
 
+		sprite.GetComponent<SpriteRenderer> ().enabled = false;
+
 		Reset ();
 	}
 
@@ -293,6 +304,12 @@ public class PlayerController : MonoBehaviour {
 		if (Time.time < 0.5f) {
 			return;
 		}
+		foreach (var engine in engines) {
+			engine.Stop ();
+		}
+		rb.velocity = Vector2.zero;
+		rb.isKinematic = true;
+		dead = true;
 		BreakChain ();
 		BreakPreview ();
 		GameObject.Find ("GameManager").GetComponent<GameManager> ().ResetGame ();
@@ -329,21 +346,29 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D (Collision2D coll) {
-		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
-			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
-			if (rb.velocity.magnitude > breakSpeed) {
+		if (!dead) {
+			if (coll.gameObject.tag == "Deadly") {
 				Explode ();
 			}
-		} else {
-			if (rb.velocity.magnitude > breakSpeed) {
-				Explode ();
+
+			if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
+				Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
+				if (rb.velocity.magnitude > breakSpeed) {
+					Explode ();
+				}
+			} else {
+				if (rb.velocity.magnitude > breakSpeed) {
+					Explode ();
+				}
 			}
 		}
 	}
 
 	void OnTriggerEnter2D (Collider2D coll) {
-		if (coll.tag == "DeathZone") {
-			Explode ();
+		if (!dead) {
+			if (coll.tag == "DeathZone") {
+				Explode ();
+			}
 		}
 	}
 }

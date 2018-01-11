@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   breakSpeed: 7
-  lifeTime: 1
+  lifeTime: 1.5
   acceleration: 100
   maxSpeed: 50
 --- !u!198 &198269272185188350

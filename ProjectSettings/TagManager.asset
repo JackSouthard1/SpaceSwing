@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Hookable
   - DeathZone
+  - Deadly
   layers:
   - Default
   - TransparentFX
