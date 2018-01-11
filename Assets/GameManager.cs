@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
 	static GameManager instance;
 
 	[Header("Cutscene")]
+	public bool playedCutscene = false;
 	public float shipSpeed;
 	public float cutSceneLength;
 	public float fuelGuageAppearDelay;
@@ -17,9 +18,6 @@ public class GameManager : MonoBehaviour {
 
 	[HideInInspector]
 	public bool inCutscene = false;
-
-	[HideInInspector]
-	public bool playedCutscene = false;
 
 	Animation cutsceneExit;
 	PlayerController pc;

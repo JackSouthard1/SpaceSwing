@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 	private GameManager gm;
@@ -11,14 +12,23 @@ public class PlayerController : MonoBehaviour {
 	[Header("Hook")]
 	public float hookOffset;
 	public float radius;
-	public float breakBuffer = 0f; 
+	public float breakBuffer = 0f;
+
+	[Header("Boost")]
+	public float boostStrength;
+	public float maxBoostTime;
+	public float boostSiphonRate;
+	float boostTimeRemaining = 0f;
+	bool boosting = false;
+
+	Text boostPercentageText;
 	GameObject previewObject;
 	GameObject hookedObject;
 	Transform hook;
 	LineRenderer chain;
 	SpringJoint2D spring;
 
-	public Vector2 hookPos = Vector2.zero;
+	Vector2 hookPos = Vector2.zero;
 	enum HookState {
 		None,
 		Preview,
@@ -28,6 +38,7 @@ public class PlayerController : MonoBehaviour {
 //	bool hookActive = false;
 
 	void Start () {
+		boostPercentageText = GameObject.Find ("Canvas").transform.Find ("BoostPercentage").GetComponent<Text> ();
 		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 		sprite = transform.Find ("Sprite");
 		rb = GetComponent<Rigidbody2D> ();
@@ -37,7 +48,7 @@ public class PlayerController : MonoBehaviour {
 
 		rb.velocity = Vector2.right * gm.shipSpeed;
 
-		engines = transform.Find ("Engines").GetComponentsInChildren<ParticleSystem> ();
+		engines = GetComponentsInChildren<ParticleSystem> ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
@@ -47,6 +58,16 @@ public class PlayerController : MonoBehaviour {
 		if (gm.inCutscene) {
 			rb.velocity = Vector2.right * gm.shipSpeed;
 			return;
+		}
+
+		if (Input.GetKeyDown (KeyCode.RightShift) || Input.GetKeyDown (KeyCode.LeftShift)) {
+			if (!boosting) {
+				StartBoost ();
+			}
+		} else if (Input.GetKeyUp (KeyCode.RightShift) || Input.GetKeyUp (KeyCode.LeftShift)) {
+			if (boosting) {
+				EndBoost();
+			}
 		}
 
 		if (Input.GetKeyDown (KeyCode.Space)) {
@@ -69,6 +90,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void LateUpdate () {
+		// rotation
 		if (rb.velocity.magnitude > 0.5f) {
 			Vector2 v = rb.velocity;
 			float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
@@ -76,7 +98,26 @@ public class PlayerController : MonoBehaviour {
 			sprite.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 		}
 
+		// boosting
+		float boost01Percent = Mathf.Clamp01(boostTimeRemaining / maxBoostTime);
+		int boost0100Percent = Mathf.RoundToInt (boost01Percent * 100f);
+		boostPercentageText.text = boost0100Percent.ToString() + "%";
+
+		if (boosting) {
+			rb.AddForce (rb.velocity.normalized * boostStrength);
+			boostTimeRemaining -= Time.deltaTime;
+			if (boostTimeRemaining < 0f) {
+				EndBoost ();
+			}
+		}
+
+		// hooking
 		if (hookState == HookState.Attached) {
+			// add boost
+			if (boostTimeRemaining < maxBoostTime) {
+				boostTimeRemaining += boostSiphonRate;
+			}
+
 			Vector3 hookPos3d = hookedObject.transform.position;
 			hookPos = new Vector2 (hookPos3d.x, hookPos3d.y);
 
@@ -122,6 +163,20 @@ public class PlayerController : MonoBehaviour {
 	void BreakPreview () {
 		chain.enabled = false;
 		hookState = HookState.None;
+	}
+
+	void StartBoost () {
+		boosting = true;
+		foreach (var engine in engines) {
+			engine.Play ();
+		}
+	}
+
+	void EndBoost () {
+		boosting = false;
+		foreach (var engine in engines) {
+			engine.Stop ();
+		}
 	}
 
 	void HookObject (GameObject hookTarget) {
