@@ -9,10 +9,14 @@ public class PlayerController : MonoBehaviour {
 	private Transform sprite;
 	private ParticleSystem[] engines;
 
-	[Header("Hook")]
+	public float breakSpeed;
+
+	[Header("Movement")]
+	public float maxY;
 	public float hookOffset;
 	public float radius;
 	public float breakBuffer = 0f;
+	public float maxTurnAngle;
 
 	[Header("Boost")]
 	public float boostStrength;
@@ -70,7 +74,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
-		if (Input.GetKeyDown (KeyCode.Space)) {
+		if (Input.GetKey (KeyCode.Space)) {
 			if (hookState != HookState.Attached) {
 				GameObject GO = GetHookableObject (); 
 				if (GO != null) {
@@ -93,9 +97,23 @@ public class PlayerController : MonoBehaviour {
 		// rotation
 		if (rb.velocity.magnitude > 0.5f) {
 			Vector2 v = rb.velocity;
-			float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-//			print (angle);
-			sprite.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+			float targetAngle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+
+//			float shipAngle = sprite.rotation.eulerAngles.z;
+//			if (shipAngle > 180) {
+//				shipAngle = -180 + (shipAngle - 180);
+//			}
+//
+//			float diff = targetAngle - shipAngle;
+//			float diffClamped = Mathf.Clamp (diff, -maxTurnAngle, maxTurnAngle) * Mathf.Abs(diff) / 3f;
+//			float angle = shipAngle + diffClamped;
+//			print ("Ship: " + shipAngle + " Target Angle: " + targetAngle + " Diff: " + diffClamped + " Angle: " + angle);
+			sprite.rotation = Quaternion.AngleAxis(targetAngle, Vector3.forward);
+		}
+
+		// ceiling
+		if (transform.position.y > maxY) {
+			rb.velocity = new Vector2 (rb.velocity.x, 0f);
 		}
 
 		// boosting
@@ -114,8 +132,10 @@ public class PlayerController : MonoBehaviour {
 		// hooking
 		if (hookState == HookState.Attached) {
 			// add boost
-			if (boostTimeRemaining < maxBoostTime) {
-				boostTimeRemaining += boostSiphonRate;
+			if (hookedObject.name.Contains ("Ship")) {
+				if (boostTimeRemaining < maxBoostTime) {
+					boostTimeRemaining += boostSiphonRate;
+				}
 			}
 
 			Vector3 hookPos3d = hookedObject.transform.position;
@@ -305,6 +325,19 @@ public class PlayerController : MonoBehaviour {
 		rb.gravityScale = 3f;
 		foreach (var engine in engines) {
 			engine.Stop ();
+		}
+	}
+
+	void OnCollisionEnter2D (Collision2D coll) {
+		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
+			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
+			if (rb.velocity.magnitude > breakSpeed) {
+				Explode ();
+			}
+		} else {
+			if (rb.velocity.magnitude > breakSpeed) {
+				Explode ();
+			}
 		}
 	}
 

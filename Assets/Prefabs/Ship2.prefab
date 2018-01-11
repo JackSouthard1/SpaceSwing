@@ -219,6 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5c377e242851447fa67b7effc9e47d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  breakSpeed: 7
   lifeTime: 2
   acceleration: 70
   maxSpeed: 25

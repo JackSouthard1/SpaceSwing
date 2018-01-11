@@ -3656,9 +3656,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e5aeda23ee64dd99dcdd3e2e249cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  breakSpeed: 25
+  maxY: 60
   hookOffset: 1
   radius: 30
   breakBuffer: 10
+  maxTurnAngle: 1
   boostStrength: 7.5
   maxBoostTime: 2
   boostSiphonRate: 0.01
@@ -3700,7 +3703,7 @@ SpringJoint2D:
   m_AutoConfigureDistance: 1
   m_Distance: 0.005
   m_DampingRatio: 0
-  m_Frequency: 2
+  m_Frequency: 1
 --- !u!1 &454091912
 GameObject:
   m_ObjectHideFlags: 0
@@ -7209,7 +7212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce485ba3abe04f3a8118bea34e03e0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkSpawnBuffer: 200
+  objectSpawnBuffer: 100
   objectDespawnDst: 100
   allLevelChunks:
   - chunkSize: 40
@@ -7235,6 +7238,9 @@ MonoBehaviour:
     - pos: {x: 97, y: 26}
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
   activeObjects: []
+  starPrefab: {fileID: 1827894580059554, guid: 7d8c178f5044a437e85a8ffd712c57e8, type: 2}
+  starSpawnIntervals: 1
+  initialStarCount: 100
 --- !u!4 &653718220
 Transform:
   m_ObjectHideFlags: 0

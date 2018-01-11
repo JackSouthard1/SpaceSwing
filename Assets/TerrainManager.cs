@@ -3,10 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainManager : MonoBehaviour {
-	public float chunkSpawnBuffer;
+	[Header("Chunks")]
+	public float objectSpawnBuffer;
 	public float objectDespawnDst;
 	public List<LevelChunk> allLevelChunks;
 	public List<GameObject> activeObjects = new List<GameObject>();
+
+	[Header("Stars")]
+	public GameObject starPrefab;
+	public float starSpawnIntervals;
+	public float initialStarCount;
+
+	float farthestStarX;
+
 	float farthestX = 0f;
 	Transform player;
 	float curChunkX = 0f;
@@ -21,8 +30,12 @@ public class TerrainManager : MonoBehaviour {
 	void Update () {
 		if (player.transform.position.x > farthestX) {
 			farthestX = player.transform.position.x;
-			if (farthestX + chunkSpawnBuffer > curChunkX) {
+			if (farthestX + objectSpawnBuffer > curChunkX) {
 				ExpressNextChunk ();
+			}
+
+			if (farthestX + objectSpawnBuffer > farthestStarX) {
+				CreateNextStar ();
 			}
 
 			TestForObjectDespawns ();
@@ -33,9 +46,22 @@ public class TerrainManager : MonoBehaviour {
 		ClearObjects ();
 		farthestX = 0f;
 		curChunkX = 0f;
+		farthestStarX = -50f;
 		for (int i = 0; i < 3; i++) {
 			ExpressNextChunk ();
 		}
+
+		for (int i = 0; i < initialStarCount; i++) {
+			CreateNextStar ();
+		}
+	}
+
+	void CreateNextStar () {
+		Vector3 spawnPos = new Vector3 (farthestStarX, Random.Range (-50, 30), 10f);
+		GameObject star = (GameObject)Instantiate (starPrefab, spawnPos, Quaternion.identity, transform);
+		activeObjects.Add (star);
+
+		farthestStarX += starSpawnIntervals;
 	}
 
 	void ExpressNextChunk () {

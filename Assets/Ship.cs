@@ -10,6 +10,8 @@ public class Ship : MonoBehaviour {
 
 	bool hooked = false;
 
+	public float breakSpeed;
+
 	[Header("Health")]
 	public float lifeTime;
 	float percentLife;
@@ -60,6 +62,19 @@ public class Ship : MonoBehaviour {
 		explosion.transform.position = transform.position;
 
 		Destroy (gameObject);
+	}
+
+	void OnCollisionEnter2D (Collision2D coll) {
+		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
+			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
+			if (rb.velocity.magnitude > breakSpeed) {
+				Destroyed ();
+			}
+		} else {
+			if (rb.velocity.magnitude > breakSpeed) {
+				Destroyed ();
+			}
+		}
 	}
 
 	public void HookStart () {
