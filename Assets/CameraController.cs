@@ -18,7 +18,8 @@ public class CameraController : MonoBehaviour {
 	}
 
 	public void ResetCamera () {
-		farthestX = 0f;
+		farthestX = player.transform.position.x;
+		transform.position = new Vector3 (farthestX, offset.y, offset.z);
 	}
 	
 	void FixedUpdate () {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PoliceController : MonoBehaviour {
+	GameManager gm;
+
 	public float maxFollowDst;
 	public float speed;
 	public float maxAngle;
@@ -17,12 +19,13 @@ public class PoliceController : MonoBehaviour {
 	void Start () {
 		player = GameObject.Find ("Player").transform;
 		rb = GetComponent<Rigidbody2D> ();
+		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 
-		ResetPolice ();
+		transform.position = new Vector3 (-gm.policeStartOffset, 0f, 0f);
+		InitPolice ();
 	}
 
-	public void ResetPolice () {
-		transform.position = new Vector3 (-maxFollowDst, 0f, 0f);
+	public void InitPolice () {
 		rb.velocity = Vector2.right * speed;
 		lastY = transform.position.y;
 
@@ -53,10 +56,21 @@ public class PoliceController : MonoBehaviour {
 
 	void OnTriggerEnter2D (Collider2D coll) {
 		if (coll.tag == "Player") {
-			rb.velocity = Vector2.zero;
-			chasing = false;
+			if (Time.time > 0.5f) {
+				rb.velocity = Vector2.zero;
+				chasing = false;
 
-			player.GetComponentInParent<PlayerController> ().Caught ();
+				player.GetComponentInParent<PlayerController> ().Caught ();
+			}
 		}
+	}
+
+	public void EnterCutScene () {
+		transform.position = new Vector3 (-gm.playerShipStartOffset - gm.policeStartOffset, 0f, 0.5f);
+		rb.velocity = Vector2.right * gm.shipSpeed;
+	}
+
+	public void ExitCutScene () {
+		InitPolice ();
 	}
 }

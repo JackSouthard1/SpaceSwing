@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
+	private GameManager gm;
 	private Rigidbody2D rb;
 	private Transform sprite;
+	private ParticleSystem[] engines;
 
 	[Header("Hook")]
 	public float hookOffset;
@@ -26,14 +28,27 @@ public class PlayerController : MonoBehaviour {
 //	bool hookActive = false;
 
 	void Start () {
+		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 		sprite = transform.Find ("Sprite");
 		rb = GetComponent<Rigidbody2D> ();
 		hook = transform.Find ("Chain").Find ("Hook");
 		chain = GetComponentInChildren<LineRenderer> ();
 		spring = GetComponent<SpringJoint2D> ();
+
+		rb.velocity = Vector2.right * gm.shipSpeed;
+
+		engines = transform.Find ("Engines").GetComponentsInChildren<ParticleSystem> ();
+		foreach (var engine in engines) {
+			engine.Stop ();
+		}
 	}
 	
 	void Update () {
+		if (gm.inCutscene) {
+			rb.velocity = Vector2.right * gm.shipSpeed;
+			return;
+		}
+
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			if (hookState != HookState.Attached) {
 				GameObject GO = GetHookableObject (); 
@@ -188,6 +203,10 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Explode () {
+		GameObject explosionPrefab = Resources.Load ("Explosion") as GameObject;
+		GameObject explosion = (GameObject)Instantiate (explosionPrefab);
+		explosion.transform.position = transform.position;
+
 		Reset ();
 	}
 
@@ -196,13 +215,42 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void Reset () {
+		if (Time.time < 0.5f) {
+			return;
+		}
 		BreakChain ();
 		BreakPreview ();
-		transform.position = Vector3.zero;
-		rb.velocity = Vector2.zero;
-		GameObject.Find ("TerrainManager").GetComponent<TerrainManager> ().ResetTerrain ();
-		Camera.main.GetComponent<CameraController> ().ResetCamera ();
-		GameObject.Find ("Police").GetComponent<PoliceController> ().ResetPolice ();
+		GameObject.Find ("GameManager").GetComponent<GameManager> ().ResetGame ();
+
+//		transform.position = Vector3.zero;
+//		rb.velocity = Vector2.zero;
+	}
+
+	public void StartCutscene () {
+		rb.gravityScale = 0f;
+
+		transform.position = new Vector3 (-gm.playerShipStartOffset, 0f, 0f);
+
+		foreach (var engine in engines) {
+			engine.Play ();
+		}
+	}
+
+	public void SputterEngines () {
+		Animation anim = GetComponentInChildren<Animation> ();
+		anim.Play ();
+		anim.GetComponent<SpriteRenderer> ().enabled = true;
+	}
+
+	public void ExitCutscene () {
+		Animation anim = GetComponentInChildren<Animation> ();
+		anim.Stop ();
+		anim.GetComponent<SpriteRenderer> ().enabled = false;
+
+		rb.gravityScale = 3f;
+		foreach (var engine in engines) {
+			engine.Stop ();
+		}
 	}
 
 	void OnTriggerEnter2D (Collider2D coll) {
