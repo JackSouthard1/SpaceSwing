@@ -19,7 +19,8 @@ public class TerrainManager : MonoBehaviour {
 
 	float farthestStarX;
 
-	float farthestX = 0f;
+	[HideInInspector]
+	public float farthestX = 0f;
 	Transform player;
 	float curChunkX = 0f;
 

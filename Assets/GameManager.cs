@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 	static GameManager instance;
+
+	[HideInInspector]
+	public int score = 0;
+	int lastScore;
 
 	[Header("Cutscene")]
 	public bool playedCutscene = false;
@@ -30,6 +35,10 @@ public class GameManager : MonoBehaviour {
 	PlayerController pc;
 	PoliceController police;
 
+	GameObject gameSummary;
+	Text scoreText;
+	TerrainManager tm;
+
 	void Awake () {
 		if (instance == null) {
 			instance = this;
@@ -47,13 +56,28 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		playerShipStartOffset = shipSpeed * cutSceneLength;
 
+		gameSummary = GameObject.Find ("Canvas").transform.Find ("GameSummary").gameObject;
+		gameSummary.SetActive (false);
+
+		scoreText = GameObject.Find ("Canvas").transform.Find ("Score").GetComponent<Text> ();
+		tm = GameObject.Find ("TerrainManager").GetComponent<TerrainManager> ();
+
 		pc = GameObject.Find ("Player").GetComponent<PlayerController> ();
 		police = GameObject.Find ("Police").GetComponent<PoliceController> ();
 		cutsceneExit = GameObject.Find ("Canvas").GetComponentInChildren<Animation> ();
 
 		if (!playedCutscene) {
 			StartCutscene ();
+		} else {
+			scoreText.enabled = true;
 		}
+	}
+
+	public void ResetStart () {
+		if (gameSummary == null) {
+			gameSummary = GameObject.Find ("Canvas").transform.Find ("GameSummary").gameObject;
+		}
+		gameSummary.transform.Find ("LastScore").GetComponent<Text> ().text = "Last Score: " + lastScore;
 	}
 
 	public void Unpause () {
@@ -63,7 +87,12 @@ public class GameManager : MonoBehaviour {
 		if (police == null) {
 			police = GameObject.Find ("Police").GetComponent<PoliceController> ();
 		}
+		if (gameSummary == null) {
+			gameSummary = GameObject.Find ("Canvas").transform.Find ("GameSummary").gameObject;
+		}
+		gameSummary.SetActive (false);
 
+		scoreText.enabled = true;
 		paused = false;
 		pc.Unpause ();
 		police.Unpause ();
@@ -84,6 +113,7 @@ public class GameManager : MonoBehaviour {
 		pc.ExitCutscene ();
 		police.ExitCutScene();
 
+		scoreText.enabled = true;
 		inCutscene = false;
 		playedCutscene = true;
 	}
@@ -97,10 +127,25 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 
+		// update score
+		if (tm == null) {
+			tm = GameObject.Find ("TerrainManager").GetComponent<TerrainManager> ();
+		}
+		if (scoreText == null) {
+			scoreText = GameObject.Find ("Canvas").transform.Find ("Score").GetComponent<Text> ();
+		}
+		score = Mathf.RoundToInt (tm.farthestX / 30f);
+		if (score < 0) {
+			score = 0;
+		}
+		scoreText.text = score.ToString ();
+			
 		if (awaitingReset) {
 			if (Time.time - resetSceneStartTime > timeToResetScene) {
 				awaitingReset = false;
 				paused = true;
+				lastScore = score;
+				score = 0;
 				SceneManager.LoadScene (0);
 			}
 		}

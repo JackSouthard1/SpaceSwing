@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour {
 	public float breakBuffer = 0f;
 	public float maxTurnAngle;
 
+	float connectedDst;
+
 	[Header("Boost")]
 	public float boostStrength;
 	public float maxBoostTime;
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 
 	bool dead = false;
 
+	Image fuelTank;
 	Text boostPercentageText;
 	GameObject previewObject;
 	GameObject hookedObject;
@@ -44,8 +47,12 @@ public class PlayerController : MonoBehaviour {
 //	bool hookActive = false;
 
 	void Start () {
+		fuelTank = GameObject.Find ("Canvas").transform.Find ("Boost").GetComponentInChildren<Image> ();
 		boostPercentageText = GameObject.Find ("Canvas").transform.Find ("Boost").GetComponentInChildren<Text> ();
+
 		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
+		gm.ResetStart ();
+
 		sprite = transform.Find ("Sprite");
 		rb = GetComponent<Rigidbody2D> ();
 		hook = transform.Find ("Chain").Find ("Hook");
@@ -67,6 +74,8 @@ public class PlayerController : MonoBehaviour {
 		if (rb == null) {
 			rb = GetComponent<Rigidbody2D> ();
 		}
+		boostPercentageText.enabled = true;
+		fuelTank.enabled = true;
 		rb.velocity = Vector2.right * gm.shipSpeed;
 		rb.gravityScale = 3f;
 	}
@@ -116,6 +125,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+//	float lastDst = Mathf.Infinity;
 	void LateUpdate () {
 		if (dead) {
 			return;
@@ -178,7 +188,14 @@ public class PlayerController : MonoBehaviour {
 				
 			hook.position = endWorldPos;
 
-			spring.distance = Mathf.Clamp (spring.distance * 0.995f, 10f, radius);
+			spring.distance = Mathf.Clamp (connectedDst * 0.995f, 10f, radius);
+			spring.distance = connectedDst;
+			float curDst = (hookedObject.transform.position - transform.position).magnitude;
+			if (connectedDst > curDst) {
+				spring.distance = curDst;
+			}
+//
+//			lastDst = spring.distance;
 
 			if (hookDir.magnitude - breakBuffer > radius) {
 				BreakChain ();
@@ -232,6 +249,8 @@ public class PlayerController : MonoBehaviour {
 		chain.material.color = Color.white;
 		spring.enabled = true;
 		hookedObject = hookTarget;
+
+		connectedDst = (hookTarget.transform.position - transform.position).magnitude;
 
 		Ship ship = hookedObject.GetComponent<Ship> ();
 		if (ship != null) {
@@ -355,6 +374,9 @@ public class PlayerController : MonoBehaviour {
 		Animation anim = GetComponentInChildren<Animation> ();
 		anim.Stop ();
 		anim.GetComponent<SpriteRenderer> ().enabled = false;
+
+		boostPercentageText.enabled = true;
+		fuelTank.enabled = true;
 
 		rb.gravityScale = 3f;
 		foreach (var engine in engines) {
