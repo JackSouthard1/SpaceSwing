@@ -22,6 +22,13 @@ public class PoliceController : MonoBehaviour {
 		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 
 		transform.position = new Vector3 (-gm.policeStartOffset, 0f, 0f);
+
+		if (!gm.playedCutscene) {
+			InitPolice ();
+		}
+	}
+
+	public void Unpause () {
 		InitPolice ();
 	}
 

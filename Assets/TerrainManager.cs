@@ -13,6 +13,7 @@ public class TerrainManager : MonoBehaviour {
 
 	[Header("Stars")]
 	public GameObject starPrefab;
+	public float paralaxScale;
 	public float starSpawnIntervals;
 	public float initialStarCount;
 
@@ -51,7 +52,7 @@ public class TerrainManager : MonoBehaviour {
 		ClearObjects ();
 		farthestX = 0f;
 		curChunkX = 0f;
-		farthestStarX = player.position.x - 50f;
+		farthestStarX = player.position.x - 150f;
 
 		if (spawnTerrain) {
 			for (int i = 0; i < 3; i++) {
@@ -67,9 +68,12 @@ public class TerrainManager : MonoBehaviour {
 	void CreateNextStar () {
 		Vector3 spawnPos = new Vector3 (farthestStarX, Random.Range (-50, 30), 10f);
 		GameObject star = (GameObject)Instantiate (starPrefab, spawnPos, Quaternion.identity, transform);
+		star.GetComponent<Paralax> ().Init (spawnPos, paralaxScale);
+
 		activeObjects.Add (star);
 
-		farthestStarX += starSpawnIntervals;
+
+		farthestStarX += starSpawnIntervals * paralaxScale;
 	}
 
 	void ExpressNextChunk () {

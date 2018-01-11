@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
 //	bool hookActive = false;
 
 	void Start () {
-		boostPercentageText = GameObject.Find ("Canvas").transform.Find ("BoostPercentage").GetComponent<Text> ();
+		boostPercentageText = GameObject.Find ("Canvas").transform.Find ("Boost").GetComponentInChildren<Text> ();
 		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 		sprite = transform.Find ("Sprite");
 		rb = GetComponent<Rigidbody2D> ();
@@ -52,12 +52,23 @@ public class PlayerController : MonoBehaviour {
 		chain = GetComponentInChildren<LineRenderer> ();
 		spring = GetComponent<SpringJoint2D> ();
 
-		rb.velocity = Vector2.right * gm.shipSpeed;
+		if (gm.playedCutscene) {
+			rb.gravityScale = 0f;
+		}
+
 
 		engines = GetComponentsInChildren<ParticleSystem> ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
+	}
+
+	public void Unpause () {
+		if (rb == null) {
+			rb = GetComponent<Rigidbody2D> ();
+		}
+		rb.velocity = Vector2.right * gm.shipSpeed;
+		rb.gravityScale = 3f;
 	}
 	
 	void Update () {
@@ -68,6 +79,12 @@ public class PlayerController : MonoBehaviour {
 		if (gm.inCutscene) {
 			rb.velocity = Vector2.right * gm.shipSpeed;
 			return;
+		}
+
+		if (gm.paused) {
+			if (Input.GetKeyDown (KeyCode.Space)) {
+				gm.Unpause ();
+			}
 		}
 
 		if (Input.GetKeyDown (KeyCode.RightShift) || Input.GetKeyDown (KeyCode.LeftShift)) {
@@ -194,7 +211,7 @@ public class PlayerController : MonoBehaviour {
 		hookState = HookState.None;
 	}
 
-	void StartBoost () {
+	public void StartBoost () {
 		boosting = true;
 		foreach (var engine in engines) {
 			engine.Play ();
@@ -351,15 +368,23 @@ public class PlayerController : MonoBehaviour {
 				Explode ();
 			}
 
-			if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
-				Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
-				if (rb.velocity.magnitude > breakSpeed) {
+			if (!coll.gameObject.name.Contains ("Ship")) {
+//				print (coll.relativeVelocity.magnitude);
+				if (coll.relativeVelocity.magnitude > breakSpeed) {
 					Explode ();
 				}
-			} else {
-				if (rb.velocity.magnitude > breakSpeed) {
-					Explode ();
-				}
+//				if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
+//					Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
+//					print ("My Vel: " + rb.velocity + " Their Vel: " + coll.gameObject.GetComponent<Rigidbody2D> ().velocity + " Diff: " + diff.magnitude);
+//					print (coll.relativeVelocity.magnitude);
+//					if (rb.velocity.magnitude > breakSpeed) {
+//						Explode ();
+//					}
+//				} else {
+//					if (rb.velocity.magnitude > breakSpeed) {
+//						Explode ();
+//					}
+//				}
 			}
 		}
 	}

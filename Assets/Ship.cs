@@ -69,16 +69,19 @@ public class Ship : MonoBehaviour {
 			Destroyed ();
 		}
 
-		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
-			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
-			if (rb.velocity.magnitude > breakSpeed) {
-				Destroyed ();
-			}
-		} else {
-			if (rb.velocity.magnitude > breakSpeed) {
-				Destroyed ();
-			}
+		if (coll.relativeVelocity.magnitude > breakSpeed) {
+			Destroyed ();
 		}
+//		if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
+//			Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
+//			if (rb.velocity.magnitude > breakSpeed) {
+//				Destroyed ();
+//			}
+//		} else {
+//			if (rb.velocity.magnitude > breakSpeed) {
+//				Destroyed ();
+//			}
+//		}
 	}
 
 	public void HookStart () {

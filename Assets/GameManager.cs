@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour {
 	[HideInInspector]
 	public bool inCutscene = false;
 
+	[HideInInspector]
+	public bool paused = false;
+
 	bool awaitingReset = false;
 	float timeToResetScene = 2f;
 	float resetSceneStartTime;
@@ -35,6 +38,10 @@ public class GameManager : MonoBehaviour {
 		} else if (this != instance) {
 			Destroy (gameObject);
 		}
+
+		if (playedCutscene) {
+			paused = true;	
+		}
 	}
 
 	void Start () {
@@ -47,6 +54,19 @@ public class GameManager : MonoBehaviour {
 		if (!playedCutscene) {
 			StartCutscene ();
 		}
+	}
+
+	public void Unpause () {
+		if (pc == null) {
+			pc = GameObject.Find ("Player").GetComponent<PlayerController> ();
+		}
+		if (police == null) {
+			police = GameObject.Find ("Police").GetComponent<PoliceController> ();
+		}
+
+		paused = false;
+		pc.Unpause ();
+		police.Unpause ();
 	}
 
 	void StartCutscene () {
@@ -80,6 +100,7 @@ public class GameManager : MonoBehaviour {
 		if (awaitingReset) {
 			if (Time.time - resetSceneStartTime > timeToResetScene) {
 				awaitingReset = false;
+				paused = true;
 				SceneManager.LoadScene (0);
 			}
 		}
