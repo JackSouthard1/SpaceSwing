@@ -38,7 +38,7 @@ public class Ship : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		if (hooked) {
 			hookedTime += Time.deltaTime;
 			percentLife = hookedTime / lifeTime;

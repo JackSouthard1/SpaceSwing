@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 	static GameManager instance;
 
+	public bool touchControls;
+
 	[HideInInspector]
 	public int score = 0;
 	int lastScore;
@@ -51,6 +53,10 @@ public class GameManager : MonoBehaviour {
 		if (playedCutscene) {
 			paused = true;	
 		}
+
+		// fps
+		QualitySettings.vSyncCount = 0;
+		Application.targetFrameRate = 60;
 	}
 
 	void Start () {
@@ -71,6 +77,11 @@ public class GameManager : MonoBehaviour {
 		} else {
 			scoreText.enabled = true;
 		}
+
+		// initialize high score
+		if (!PlayerPrefs.HasKey ("HighScore")) {
+			PlayerPrefs.SetInt ("HighScore", 0);
+		}
 	}
 
 	public void ResetStart () {
@@ -78,6 +89,9 @@ public class GameManager : MonoBehaviour {
 			gameSummary = GameObject.Find ("Canvas").transform.Find ("GameSummary").gameObject;
 		}
 		gameSummary.transform.Find ("LastScore").GetComponent<Text> ().text = "Last Score: " + lastScore;
+
+		int highScore = PlayerPrefs.GetInt ("HighScore");
+		gameSummary.transform.Find ("HighScore").GetComponent<Text> ().text = "High Score: " + highScore;
 	}
 
 	public void Unpause () {
@@ -92,6 +106,9 @@ public class GameManager : MonoBehaviour {
 		}
 		gameSummary.SetActive (false);
 
+		if (scoreText == null) {
+			scoreText = GameObject.Find ("Canvas").transform.Find ("Score").GetComponent<Text> ();
+		}
 		scoreText.enabled = true;
 		paused = false;
 		pc.Unpause ();
@@ -145,6 +162,11 @@ public class GameManager : MonoBehaviour {
 				awaitingReset = false;
 				paused = true;
 				lastScore = score;
+				int curHighScore = PlayerPrefs.GetInt("HighScore");
+				if (score > curHighScore) {
+//					print ("Updating high score to: " + score);
+					PlayerPrefs.SetInt ("HighScore", score);
+				}
 				score = 0;
 				SceneManager.LoadScene (0);
 			}

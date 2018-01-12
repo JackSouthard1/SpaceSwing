@@ -27,10 +27,17 @@ public class PlayerController : MonoBehaviour {
 	float boostTimeRemaining = 0f;
 	bool boosting = false;
 
+	[Header("Indicator")]
+	public float maxAngle;
+	GameObject boostIndicator;
+	RectTransform indicator;
+
+	GameObject hookIndicator;
+
 	bool dead = false;
 
-	Image fuelTank;
-	Text boostPercentageText;
+	float halfScreenWidth;
+
 	GameObject previewObject;
 	GameObject hookedObject;
 	Transform hook;
@@ -47,8 +54,13 @@ public class PlayerController : MonoBehaviour {
 //	bool hookActive = false;
 
 	void Start () {
-		fuelTank = GameObject.Find ("Canvas").transform.Find ("Boost").GetComponentInChildren<Image> ();
-		boostPercentageText = GameObject.Find ("Canvas").transform.Find ("Boost").GetComponentInChildren<Text> ();
+		halfScreenWidth = Screen.currentResolution.width / 2f;
+
+		hookIndicator = GameObject.Find ("HookIndicator");
+		boostIndicator = GameObject.Find ("BoostIndicator");
+		indicator = boostIndicator.transform.Find ("Indicator").GetComponent<RectTransform>();
+		hookIndicator.SetActive (false);
+		boostIndicator.SetActive (false);
 
 		gm = GameObject.Find ("GameManager").GetComponent<GameManager> ();
 		gm.ResetStart ();
@@ -74,8 +86,8 @@ public class PlayerController : MonoBehaviour {
 		if (rb == null) {
 			rb = GetComponent<Rigidbody2D> ();
 		}
-		boostPercentageText.enabled = true;
-		fuelTank.enabled = true;
+		boostIndicator.SetActive (true);
+		hookIndicator.SetActive (true);
 		rb.velocity = Vector2.right * gm.shipSpeed;
 		rb.gravityScale = 3f;
 	}
@@ -89,33 +101,84 @@ public class PlayerController : MonoBehaviour {
 			rb.velocity = Vector2.right * gm.shipSpeed;
 			return;
 		}
+			
+		// touch
+		if (gm.touchControls) {
+			// get touch info
+			bool leftTouch = false;
+			bool rightTouch = false;
 
-		if (gm.paused) {
-			if (Input.GetKeyDown (KeyCode.Space)) {
-				gm.Unpause ();
-			}
-		}
-
-		if (Input.GetKeyDown (KeyCode.RightShift) || Input.GetKeyDown (KeyCode.LeftShift)) {
-			if (!boosting) {
-				StartBoost ();
-			}
-		} else if (Input.GetKeyUp (KeyCode.RightShift) || Input.GetKeyUp (KeyCode.LeftShift)) {
-			if (boosting) {
-				EndBoost();
-			}
-		}
-
-		if (Input.GetKey (KeyCode.Space)) {
-			if (hookState != HookState.Attached) {
-				GameObject GO = GetHookableObject (); 
-				if (GO != null) {
-					HookObject (GO);
+			Touch[] touches = Input.touches;
+			foreach (var curTouch in touches) {
+				if (curTouch.position.x < halfScreenWidth) {
+					leftTouch = true;
+				} else if (curTouch.position.x > halfScreenWidth) {
+					rightTouch = true;
 				}
 			}
-		} else if (Input.GetKeyUp (KeyCode.Space)){
-			BreakChain ();
-		} else if (hookState != HookState.Attached){
+
+			// test inputs
+			if (gm.paused) {
+				if (rightTouch || leftTouch) {
+					gm.Unpause ();
+				}
+			}
+
+			if (rightTouch) {
+				if (!boosting) {
+					StartBoost();
+				}
+			} else {
+				if (boosting) {
+					EndBoost();
+				}
+			}
+
+			if (leftTouch) {
+				if (hookState != HookState.Attached) {
+					GameObject GO = GetHookableObject (); 
+					if (GO != null) {
+						HookObject (GO);
+					}
+				}
+			} else {
+				if (hookState == HookState.Attached) {
+					BreakChain();
+				}
+			}
+		}
+
+		// keyboard
+		if (!gm.touchControls) {
+			if (gm.paused) {
+				if (Input.GetKeyDown (KeyCode.Space)) {
+					gm.Unpause ();
+				}
+			}
+
+			if (Input.GetKeyDown (KeyCode.LeftShift)) {
+				if (!boosting) {
+					StartBoost ();
+				}
+			} else if (Input.GetKeyUp (KeyCode.LeftShift)) {
+				if (boosting) {
+					EndBoost();
+				}
+			}
+
+			if (Input.GetKey (KeyCode.Space)) {
+				if (hookState != HookState.Attached) {
+					GameObject GO = GetHookableObject (); 
+					if (GO != null) {
+						HookObject (GO);
+					}
+				}
+			} else if (Input.GetKeyUp (KeyCode.Space)){
+				BreakChain ();
+			}
+		}
+
+		if (hookState != HookState.Attached){
 			GameObject closestPreviewObject = GetHookableObject (); 
 			if (closestPreviewObject != null) {
 				PreviewObject (closestPreviewObject);
@@ -125,38 +188,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-//	float lastDst = Mathf.Infinity;
-	void LateUpdate () {
-		if (dead) {
-			return;
-		}
-		// rotation
-		if (rb.velocity.magnitude > 0.5f) {
-			Vector2 v = rb.velocity;
-			float targetAngle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-
-//			float shipAngle = sprite.rotation.eulerAngles.z;
-//			if (shipAngle > 180) {
-//				shipAngle = -180 + (shipAngle - 180);
-//			}
-//
-//			float diff = targetAngle - shipAngle;
-//			float diffClamped = Mathf.Clamp (diff, -maxTurnAngle, maxTurnAngle) * Mathf.Abs(diff) / 3f;
-//			float angle = shipAngle + diffClamped;
-//			print ("Ship: " + shipAngle + " Target Angle: " + targetAngle + " Diff: " + diffClamped + " Angle: " + angle);
-			sprite.rotation = Quaternion.AngleAxis(targetAngle, Vector3.forward);
-		}
-
-		// ceiling
-		if (transform.position.y > maxY) {
-			rb.velocity = new Vector2 (rb.velocity.x, 0f);
-		}
-
-		// boosting
-		float boost01Percent = Mathf.Clamp01(boostTimeRemaining / maxBoostTime);
-		int boost0100Percent = Mathf.RoundToInt (boost01Percent * 100f);
-		boostPercentageText.text = boost0100Percent.ToString() + "%";
-
+	void FixedUpdate () {
 		if (boosting) {
 			rb.AddForce (rb.velocity.normalized * boostStrength);
 			boostTimeRemaining -= Time.deltaTime;
@@ -185,7 +217,7 @@ public class PlayerController : MonoBehaviour {
 			Vector3 chainEndPos = endWorldPos - hook.right * hookOffset;
 			chain.SetPosition (0, transform.position);
 			chain.SetPosition (1, chainEndPos);
-				
+
 			hook.position = endWorldPos;
 
 			spring.distance = Mathf.Clamp (connectedDst * 0.995f, 10f, radius);
@@ -194,13 +226,38 @@ public class PlayerController : MonoBehaviour {
 			if (connectedDst > curDst) {
 				spring.distance = curDst;
 			}
-//
-//			lastDst = spring.distance;
 
 			if (hookDir.magnitude - breakBuffer > radius) {
 				BreakChain ();
 			}
-		} else if (hookState == HookState.Preview) {
+		}
+	}
+
+	void LateUpdate () {
+		if (dead) {
+			return;
+		}
+		// rotation
+		if (rb.velocity.magnitude > 0.5f) {
+			Vector2 v = rb.velocity;
+			float targetAngle = Mathf.Atan2 (v.y, v.x) * Mathf.Rad2Deg;
+
+			sprite.rotation = Quaternion.AngleAxis (targetAngle, Vector3.forward);
+		}
+
+		// ceiling
+		if (transform.position.y > maxY) {
+			rb.velocity = new Vector2 (rb.velocity.x, 0f);
+		}
+
+		// boosting
+		float boost01Percent = Mathf.Clamp01 (boostTimeRemaining / maxBoostTime);
+
+		// update Indicator
+		float indicatorAngle = maxAngle - (boost01Percent * maxAngle * 2f);
+		indicator.rotation = Quaternion.Euler (new Vector3 (0f, 0f, indicatorAngle));
+
+		if (hookState == HookState.Preview) {
 			Vector3 hookPos3d = previewObject.transform.position;
 			hookPos = new Vector2 (hookPos3d.x, hookPos3d.y);
 
@@ -209,10 +266,6 @@ public class PlayerController : MonoBehaviour {
 			Vector3 chainEndPos = endWorldPos - hook.right * hookOffset;
 			chain.SetPosition (0, transform.position);
 			chain.SetPosition (1, chainEndPos);
-
-//			if (hookDir.magnitude - breakBuffer > radius) {
-//				BreakChain ();
-//			}
 		}
 	}
 
@@ -229,9 +282,11 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void StartBoost () {
-		boosting = true;
-		foreach (var engine in engines) {
-			engine.Play ();
+		if (boostTimeRemaining > 0) {
+			boosting = true;
+			foreach (var engine in engines) {
+				engine.Play ();
+			}
 		}
 	}
 
@@ -375,8 +430,8 @@ public class PlayerController : MonoBehaviour {
 		anim.Stop ();
 		anim.GetComponent<SpriteRenderer> ().enabled = false;
 
-		boostPercentageText.enabled = true;
-		fuelTank.enabled = true;
+		boostIndicator.SetActive (true);
+		hookIndicator.SetActive (true);
 
 		rb.gravityScale = 3f;
 		foreach (var engine in engines) {
