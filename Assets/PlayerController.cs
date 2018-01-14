@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
 
 	[Header("Movement")]
 	public float maxY;
+	public float hookZ;
 	public float hookOffset;
 	public float radius;
 	public float breakBuffer = 0f;
@@ -67,7 +68,10 @@ public class PlayerController : MonoBehaviour {
 
 		sprite = transform.Find ("Sprite");
 		rb = GetComponent<Rigidbody2D> ();
+
 		hook = transform.Find ("Chain").Find ("Hook");
+		hook.GetComponent<SpriteRenderer> ().enabled = false;
+
 		chain = GetComponentInChildren<LineRenderer> ();
 		spring = GetComponent<SpringJoint2D> ();
 
@@ -212,13 +216,6 @@ public class PlayerController : MonoBehaviour {
 			Vector3 endWorldPos = new Vector3 (hookPos.x, hookPos.y, 0f);
 
 			Vector2 hookDir = endWorldPos - transform.position; 
-			hook.right = hookDir; 
-
-			Vector3 chainEndPos = endWorldPos - hook.right * hookOffset;
-			chain.SetPosition (0, transform.position);
-			chain.SetPosition (1, chainEndPos);
-
-			hook.position = endWorldPos;
 
 			spring.distance = Mathf.Clamp (connectedDst * 0.995f, 10f, radius);
 			spring.distance = connectedDst;
@@ -237,6 +234,24 @@ public class PlayerController : MonoBehaviour {
 		if (dead) {
 			return;
 		}
+
+		// chain and hook visuals
+		if (hookState == HookState.Attached) {
+			Vector3 hookPos3d = hookedObject.transform.position;
+			hookPos = new Vector2 (hookPos3d.x, hookPos3d.y);
+
+			Vector3 endWorldPos = new Vector3 (hookPos.x, hookPos.y, 0f);
+
+			Vector2 hookDir = endWorldPos - transform.position; 
+			hook.right = hookDir; 
+
+			Vector3 chainEndPos = endWorldPos - hook.right * hookOffset;
+			chain.SetPosition (0, transform.position);
+			chain.SetPosition (1, chainEndPos);
+
+			hook.position = new Vector3 (endWorldPos.x, endWorldPos.y, hookZ);
+		}
+
 		// rotation
 		if (rb.velocity.magnitude > 0.5f) {
 			Vector2 v = rb.velocity;
@@ -299,7 +314,10 @@ public class PlayerController : MonoBehaviour {
 
 	void HookObject (GameObject hookTarget) {
 		spring.connectedBody = hookTarget.GetComponent<Rigidbody2D> ();
+
+		hook.position = new Vector3 (hookTarget.transform.position.x, hookTarget.transform.position.y, hookZ);
 		hook.GetComponent<SpriteRenderer> ().enabled = true;
+
 		chain.enabled = true;
 		chain.material.color = Color.white;
 		spring.enabled = true;

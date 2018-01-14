@@ -13,11 +13,20 @@ public class TerrainManager : MonoBehaviour {
 
 	[Header("Stars")]
 	public GameObject starPrefab;
-	public float paralaxScale;
+	public float starParalaxScale;
 	public float starSpawnIntervals;
 	public float initialStarCount;
+	public float initialStarX;
+	Transform lastStar = null;
 
-	float farthestStarX;
+	[Header("Planet Chunks")]
+	public GameObject planetChunkPrefab;
+	public float planetChunkY;
+	public float planetChunkParalaxScale;
+	public float planetChunkSpawnIntervals;
+	public float initialPlanetChunkCount;
+	public float initialPlanetChunkX;
+	Transform lastPlanetChunk = null;
 
 	[HideInInspector]
 	public float farthestX = 0f;
@@ -41,8 +50,16 @@ public class TerrainManager : MonoBehaviour {
 				}
 			}
 
-			if (farthestX + objectSpawnBuffer > farthestStarX) {
+			if (lastStar == null) {
 				CreateNextStar ();
+			} else if (farthestX + objectSpawnBuffer > lastStar.position.x) {
+				CreateNextStar ();
+			}
+
+			if (lastPlanetChunk == null) {
+				CreateNextPlanetChunk ();
+			} else if (farthestX + objectSpawnBuffer > lastPlanetChunk.position.x) {
+				CreateNextPlanetChunk ();
 			}
 
 			TestForObjectDespawns ();
@@ -51,9 +68,12 @@ public class TerrainManager : MonoBehaviour {
 
 	public void ResetTerrain () {
 		ClearObjects ();
+
+		initialStarX += player.position.x;
+		initialPlanetChunkX += player.position.x;
+
 		farthestX = 0f;
 		curChunkX = 0f;
-		farthestStarX = player.position.x - 150f;
 
 		if (spawnTerrain) {
 			for (int i = 0; i < 3; i++) {
@@ -64,24 +84,50 @@ public class TerrainManager : MonoBehaviour {
 		for (int i = 0; i < initialStarCount; i++) {
 			CreateNextStar ();
 		}
+
+		for (int i = 0; i < initialPlanetChunkCount; i++) {
+			CreateNextPlanetChunk ();
+		}
 	}
 
 	void CreateNextStar () {
-		Vector3 spawnPos = new Vector3 (farthestStarX, Random.Range (-50, 30), 10f);
+		Vector3 spawnPos;
+		if (lastStar == null) {
+			spawnPos = new Vector3 (initialStarX, Random.Range (-50, 30), 50f);
+		} else {
+			spawnPos = new Vector3 (lastStar.position.x + starSpawnIntervals, Random.Range (-50, 30), 50f);
+		}
 		GameObject star = (GameObject)Instantiate (starPrefab, spawnPos, Quaternion.identity, transform);
-		star.GetComponent<Paralax> ().Init (spawnPos, paralaxScale);
+		star.GetComponent<Paralax> ().Init (spawnPos, starParalaxScale);
+		lastStar = star.transform;
 
 		activeObjects.Add (star);
+	}
 
+	void CreateNextPlanetChunk () {
+		Vector3 spawnPos;
+		if (lastPlanetChunk == null) {
+			spawnPos = new Vector3 (initialPlanetChunkX, planetChunkY, 10f);
+		} else {
+			spawnPos = new Vector3 (lastPlanetChunk.position.x + planetChunkSpawnIntervals, planetChunkY, 10f);
+		}
+		GameObject atmo = (GameObject)Instantiate (planetChunkPrefab, spawnPos, Quaternion.identity, transform);
+		atmo.GetComponent<Paralax> ().Init (spawnPos, planetChunkParalaxScale);
+		lastPlanetChunk = atmo.transform;
 
-		farthestStarX += starSpawnIntervals * paralaxScale;
+		bool flipped = (Random.value > 0.5f);
+		if (flipped) {
+			atmo.transform.localScale = new Vector3 (-atmo.transform.localScale.x, atmo.transform.localScale.y, 1f);
+		}
+
+		activeObjects.Add (atmo);
 	}
 
 	void ExpressNextChunk () {
 		LevelChunk chunk = allLevelChunks [Random.Range (0, allLevelChunks.Count)];
 
 		foreach (var levelObject in chunk.levelObjects) {
-			Vector3 spawnPos = new Vector3 (levelObject.pos.x + curChunkX, levelObject.pos.y, 0f);
+			Vector3 spawnPos = new Vector3 (levelObject.pos.x + curChunkX, levelObject.pos.y, 1f);
 			GameObject GO = (GameObject)Instantiate (levelObject.prefab, spawnPos, Quaternion.identity, transform);
 			activeObjects.Add (GO);
 		}
@@ -91,18 +137,20 @@ public class TerrainManager : MonoBehaviour {
 	}
 
 	void TestForObjectDespawns () {
+//		print (activeObjects.Count);
 		float despawnMargin = farthestX - objectDespawnDst;
-		List<int> indexesToRemove = new List<int> ();
+		List<GameObject> objectsToDelete = new List<GameObject> ();
 		for (int i = 0; i < activeObjects.Count; i++) {
 			if (activeObjects [i] != null) {
 				if (activeObjects [i].transform.position.x < despawnMargin) {
-					Destroy (activeObjects [i]);
-					indexesToRemove.Add (i);
+					objectsToDelete.Add (activeObjects [i].gameObject);
 				}
 			}
 		}
-		foreach (var index in indexesToRemove) {
-			activeObjects.RemoveAt (index);
+		foreach (var GO in objectsToDelete) {
+			activeObjects.Remove (GO);
+			Destroy (GO);
+
 		}
 			
 	}
