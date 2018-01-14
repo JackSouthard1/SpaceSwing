@@ -7465,6 +7465,48 @@ MonoBehaviour:
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
     - pos: {x: 81, y: 23}
       prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+  - chunkSize: 100
+    levelObjects:
+    - pos: {x: 16, y: -25}
+      prefab: {fileID: 1438276064303692, guid: b25a7c595bbee4679af46ad4132e6a0b, type: 2}
+    - pos: {x: 28, y: 11}
+      prefab: {fileID: 1394170195997082, guid: 5b8e145e48dcc4c9d80b29acdf2e6b22, type: 2}
+    - pos: {x: 26, y: 24}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+    - pos: {x: 15, y: 7}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+    - pos: {x: 45, y: 20}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+    - pos: {x: 66, y: -21}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+  - chunkSize: 60
+    levelObjects:
+    - pos: {x: 31, y: 21}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+    - pos: {x: 28, y: -33}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+    - pos: {x: 36, y: -5}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
+  - chunkSize: 80
+    levelObjects:
+    - pos: {x: 14, y: -12}
+      prefab: {fileID: 1394170195997082, guid: 5b8e145e48dcc4c9d80b29acdf2e6b22, type: 2}
+    - pos: {x: 36, y: 17}
+      prefab: {fileID: 1362469663190346, guid: 8f4dad4edf6424010a5b67cdec57223c, type: 2}
+    - pos: {x: 11, y: 15}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+    - pos: {x: 53, y: -10}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+  - chunkSize: 100
+    levelObjects:
+    - pos: {x: 26, y: 18}
+      prefab: {fileID: 1394170195997082, guid: 5b8e145e48dcc4c9d80b29acdf2e6b22, type: 2}
+    - pos: {x: 56, y: -14}
+      prefab: {fileID: 1394170195997082, guid: 5b8e145e48dcc4c9d80b29acdf2e6b22, type: 2}
+    - pos: {x: 25, y: -13}
+      prefab: {fileID: 1273512887774060, guid: 10482df003fad4a1dbe71687850273cc, type: 2}
+    - pos: {x: 63, y: 19}
+      prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
   activeObjects: []
   starPrefab: {fileID: 1827894580059554, guid: 7d8c178f5044a437e85a8ffd712c57e8, type: 2}
   starParalaxScale: 0.9
@@ -19049,7 +19091,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   touchControls: 0
   score: 0
-  playedCutscene: 0
+  playedCutscene: 1
   shipSpeed: 20
   cutSceneLength: 7
   fuelGuageAppearDelay: 4

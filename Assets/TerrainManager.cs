@@ -32,6 +32,7 @@ public class TerrainManager : MonoBehaviour {
 	public float farthestX = 0f;
 	Transform player;
 	float curChunkX = 0f;
+	int lastChunkID = -1;
 
 	void Start () {
 		player = GameObject.Find ("Player").transform;
@@ -125,7 +126,12 @@ public class TerrainManager : MonoBehaviour {
 	}
 
 	void ExpressNextChunk () {
-		LevelChunk chunk = allLevelChunks [Random.Range (0, allLevelChunks.Count)];
+		int random = Random.Range (0, allLevelChunks.Count);
+		while (random == lastChunkID) {
+			random = Random.Range (0, allLevelChunks.Count);
+		}
+		LevelChunk chunk = allLevelChunks [random];
+		lastChunkID = random;
 
 		foreach (var levelObject in chunk.levelObjects) {
 			Vector3 spawnPos = new Vector3 (levelObject.pos.x + curChunkX, levelObject.pos.y, 1f);
