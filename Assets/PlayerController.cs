@@ -366,9 +366,13 @@ public class PlayerController : MonoBehaviour {
 
 		if (allHookableObjects.Length > 0) {
 			float closestDstAbove = Mathf.Infinity;
+			float closestDstInfront = Mathf.Infinity;
 			float closestDist = Mathf.Infinity;
+
 			int closestIndexAbove = -1;
+			int closestIndexInfront = -1;
 			int closestIndex = 0;
+
 			for (int i = 0; i < allHookableObjects.Length; i++) {
 				float curDist = (allHookableObjects [i].transform.position - transform.position).magnitude;
 
@@ -383,9 +387,18 @@ public class PlayerController : MonoBehaviour {
 						closestIndexAbove = i;
 					}
 				}
+
+				if (allHookableObjects [i].transform.position.x > transform.position.x) { // -10f because you should be able to grab objects right under you
+					if (curDist < closestDstInfront) {
+						closestDstInfront = curDist;
+						closestIndexInfront = i;
+					}
+				}
 			}
 
-			if (closestIndexAbove != -1) {
+			if (closestIndexInfront != -1) {
+				return allHookableObjects [closestIndexInfront].gameObject;
+			} else if (closestIndexAbove != -1) {
 				return allHookableObjects [closestIndexAbove].gameObject;
 			} else {
 				return allHookableObjects [closestIndex].gameObject;
