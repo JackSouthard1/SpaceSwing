@@ -137,7 +137,6 @@ public class TerrainManager : MonoBehaviour {
 	}
 
 	void TestForObjectDespawns () {
-//		print (activeObjects.Count);
 		float despawnMargin = farthestX - objectDespawnDst;
 		List<GameObject> objectsToDelete = new List<GameObject> ();
 		for (int i = 0; i < activeObjects.Count; i++) {

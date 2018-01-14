@@ -21,6 +21,8 @@ public class Ship : MonoBehaviour {
 	[Header("Locomotion")]
 	public float acceleration;
 	public float maxSpeed;
+	public float rotation;
+	float curSpeed = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -48,8 +50,15 @@ public class Ship : MonoBehaviour {
 			}
 
 			if (rb.velocity.magnitude < maxSpeed) {
-				rb.AddRelativeForce (Vector2.right * acceleration);
+				curSpeed += acceleration;
 			}
+
+			Vector2 localForce2d = Vector2.right * curSpeed;
+			Vector3 localForce3d = new Vector3 (localForce2d.x, localForce2d.y, transform.position.z);
+			Vector3 worldForce3d = transform.TransformVector (localForce3d);
+			rb.velocity = new Vector2 (worldForce3d.x, worldForce3d.y);
+
+			transform.rotation = Quaternion.Euler (new Vector3 (0f, 0f, transform.rotation.eulerAngles.z + rotation));
 		}
 	}
 

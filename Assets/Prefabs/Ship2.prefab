@@ -221,8 +221,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   breakSpeed: 15
   lifeTime: 2
-  acceleration: 70
+  acceleration: 1
   maxSpeed: 25
+  rotation: 0
 --- !u!198 &198824664436212582
 ParticleSystem:
   m_ObjectHideFlags: 1
