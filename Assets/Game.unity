@@ -7471,8 +7471,9 @@ MonoBehaviour:
   starSpawnIntervals: 1
   initialStarCount: 200
   initialStarX: -70
-  planetChunkPrefab: {fileID: 1794519424926064, guid: 82272965e7af649a28c91a856db16f37,
-    type: 2}
+  planetChunkPrefabs:
+  - {fileID: 1794519424926064, guid: 82272965e7af649a28c91a856db16f37, type: 2}
+  - {fileID: 1658908549787922, guid: 3c672a2349d024c6387b17ddbafc7bef, type: 2}
   planetChunkY: -49
   planetChunkParalaxScale: 0.8
   planetChunkSpawnIntervals: 40
@@ -19048,7 +19049,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   touchControls: 0
   score: 0
-  playedCutscene: 1
+  playedCutscene: 0
   shipSpeed: 20
   cutSceneLength: 7
   fuelGuageAppearDelay: 4

@@ -438,12 +438,14 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void SputterEngines () {
+		StartCoroutine (ToggleEngines());
 		Animation anim = GetComponentInChildren<Animation> ();
 		anim.Play ();
 		anim.GetComponent<SpriteRenderer> ().enabled = true;
 	}
 
 	public void ExitCutscene () {
+		StopCoroutine (ToggleEngines ());
 		Animation anim = GetComponentInChildren<Animation> ();
 		anim.Stop ();
 		anim.GetComponent<SpriteRenderer> ().enabled = false;
@@ -464,22 +466,9 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			if (!coll.gameObject.name.Contains ("Ship")) {
-//				print (coll.relativeVelocity.magnitude);
 				if (coll.relativeVelocity.magnitude > breakSpeed) {
 					Explode ();
 				}
-//				if (coll.gameObject.GetComponent<Rigidbody2D> () != null) {
-//					Vector2 diff = rb.velocity - coll.gameObject.GetComponent<Rigidbody2D> ().velocity;
-//					print ("My Vel: " + rb.velocity + " Their Vel: " + coll.gameObject.GetComponent<Rigidbody2D> ().velocity + " Diff: " + diff.magnitude);
-//					print (coll.relativeVelocity.magnitude);
-//					if (rb.velocity.magnitude > breakSpeed) {
-//						Explode ();
-//					}
-//				} else {
-//					if (rb.velocity.magnitude > breakSpeed) {
-//						Explode ();
-//					}
-//				}
 			}
 		}
 	}
@@ -489,6 +478,32 @@ public class PlayerController : MonoBehaviour {
 			if (coll.tag == "DeathZone") {
 				Explode ();
 			}
+		}
+	}
+
+	IEnumerator ToggleEngines () {
+		for (int i = 0; i < 2; i++) {
+			foreach (var engine in engines) {
+				engine.Stop ();
+			}
+			yield return new WaitForSeconds(0.45f);
+			foreach (var engine in engines) {
+				engine.Play ();
+			}
+			yield return new WaitForSeconds(0.2f);
+		}
+		for (int i = 0; i < 3; i++) {
+			foreach (var engine in engines) {
+				engine.Stop ();
+			}
+			yield return new WaitForSeconds(0.25f);
+			foreach (var engine in engines) {
+				engine.Play ();
+			}
+			yield return new WaitForSeconds(0.1f);
+		}
+		foreach (var engine in engines) {
+			engine.Stop ();
 		}
 	}
 }

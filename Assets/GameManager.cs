@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour {
 	[HideInInspector]
 	public bool paused = false;
 
+	bool sputteredEngines = false;
+
 	bool awaitingReset = false;
 	float timeToResetScene = 2f;
 	float resetSceneStartTime;
@@ -134,13 +136,14 @@ public class GameManager : MonoBehaviour {
 		inCutscene = false;
 		playedCutscene = true;
 	}
-	
+
 	void Update () {
 		if (inCutscene) {
 			if (Time.time > cutSceneLength) {
 				FinishCutscene ();
-			} else if (Time.time > fuelGuageAppearDelay) {
+			} else if (Time.time > fuelGuageAppearDelay && !sputteredEngines) {
 				pc.SputterEngines ();
+				sputteredEngines = true;
 			}
 		}
 

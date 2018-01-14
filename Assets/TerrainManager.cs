@@ -20,7 +20,7 @@ public class TerrainManager : MonoBehaviour {
 	Transform lastStar = null;
 
 	[Header("Planet Chunks")]
-	public GameObject planetChunkPrefab;
+	public GameObject[] planetChunkPrefabs;
 	public float planetChunkY;
 	public float planetChunkParalaxScale;
 	public float planetChunkSpawnIntervals;
@@ -111,7 +111,8 @@ public class TerrainManager : MonoBehaviour {
 		} else {
 			spawnPos = new Vector3 (lastPlanetChunk.position.x + planetChunkSpawnIntervals, planetChunkY, 10f);
 		}
-		GameObject atmo = (GameObject)Instantiate (planetChunkPrefab, spawnPos, Quaternion.identity, transform);
+		GameObject prefab = planetChunkPrefabs [Random.Range (0, planetChunkPrefabs.Length)];
+		GameObject atmo = (GameObject)Instantiate (prefab, spawnPos, Quaternion.identity, transform);
 		atmo.GetComponent<Paralax> ().Init (spawnPos, planetChunkParalaxScale);
 		lastPlanetChunk = atmo.transform;
 
