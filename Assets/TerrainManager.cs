@@ -47,7 +47,6 @@ public class TerrainManager : MonoBehaviour {
 	public float farthestX = 0f;
 	Transform player;
 	float curChunkX = 0f;
-	int lastChunkID = -1;
 
 	void Start () {
 		player = GameObject.Find ("Player").transform;
@@ -180,8 +179,7 @@ public class TerrainManager : MonoBehaviour {
 	}
 
 	void ExpressNextChunk () {
-		int chunkTeir = Random.Range (0, teir + 1);
-		LevelChunk chunk = GetChunkOfTeir (chunkTeir);
+		LevelChunk chunk = GetChunk ();
 
 		foreach (var levelObject in chunk.levelObjects) {
 			Vector3 spawnPos = new Vector3 (levelObject.pos.x + curChunkX, levelObject.pos.y, 1f);
@@ -193,26 +191,14 @@ public class TerrainManager : MonoBehaviour {
 
 	}
 
-	LevelChunk GetChunkOfTeir (int teir) {
-		List<LevelChunk> levelChunksOfTeir = new List<LevelChunk> ();
-		int startingIndex = teir * chunksPerTeir;
-		for (int i = startingIndex; i < startingIndex + chunksPerTeir; i++) {
-			if (i >= allLevelChunks.Count) {
-				i = allLevelChunks.Count - 1;
-			}
-//			print ("Got: " + i);
+	LevelChunk GetChunk () {
+		int maxIndex = Mathf.Clamp ((teir * chunksPerTeir) + 1, 0, allLevelChunks.Count - 1);
+		int random = Random.Range (0, maxIndex + 1);
 
-			levelChunksOfTeir.Add (allLevelChunks [i]);
-		}
-//		print ("Getting Chunks of index " + startingIndex + " to " + (startingIndex + chunksPerTeir - 1));	
+//		print ("Max Index: " + maxIndex + " Random: " + random);
 
-		int random = Random.Range (0, levelChunksOfTeir.Count);
-//		while (random == lastChunkID) {
-//			random = Random.Range (0, levelChunksOfTeir.Count);
-//		}
-		lastChunkID = random;
 
-		return levelChunksOfTeir [random];
+		return allLevelChunks [random];
 	}
 
 	void TestForObjectDespawns () {
