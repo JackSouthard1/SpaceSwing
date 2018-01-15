@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour {
 		if (rb == null) {
 			rb = GetComponent<Rigidbody2D> ();
 		}
-		boostIndicator.SetActive (true);
+//		boostIndicator.SetActive (true);
 		hookIndicator.SetActive (true);
 		rb.velocity = Vector2.right * gm.shipSpeed;
 		rb.gravityScale = 3f;
@@ -198,6 +198,7 @@ public class PlayerController : MonoBehaviour {
 			boostTimeRemaining -= Time.deltaTime;
 			if (boostTimeRemaining < 0f) {
 				EndBoost ();
+				boostIndicator.SetActive (false);
 			}
 		}
 
@@ -207,6 +208,10 @@ public class PlayerController : MonoBehaviour {
 			if (hookedObject.name.Contains ("Ship")) {
 				if (boostTimeRemaining < maxBoostTime) {
 					boostTimeRemaining += boostSiphonRate;
+				}
+
+				if (!boostIndicator.activeSelf) {
+					boostIndicator.SetActive (true);
 				}
 			}
 
@@ -463,7 +468,7 @@ public class PlayerController : MonoBehaviour {
 		anim.Stop ();
 		anim.GetComponent<SpriteRenderer> ().enabled = false;
 
-		boostIndicator.SetActive (true);
+//		boostIndicator.SetActive (true);
 		hookIndicator.SetActive (true);
 
 		rb.gravityScale = 3f;
