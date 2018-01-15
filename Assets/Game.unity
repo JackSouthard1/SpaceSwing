@@ -7508,7 +7508,7 @@ MonoBehaviour:
     - pos: {x: 63, y: 19}
       prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
   activeObjects: []
-  dstPerTeir: 200
+  dstPerTeir: 300
   chunksPerTeir: 2
   starPrefab: {fileID: 1827894580059554, guid: 7d8c178f5044a437e85a8ffd712c57e8, type: 2}
   starParalaxScale: 0.9
@@ -7523,8 +7523,8 @@ MonoBehaviour:
   backgroundPrefab: {fileID: 1835333036997854, guid: 42ee24d885c784193852f8bd3a7bd929,
     type: 2}
   backgroundParalaxScale: 0.5
-  backgroundSpawnIntervals: 40
-  initialBackgroundCount: 5
+  backgroundSpawnIntervals: 20
+  initialBackgroundCount: 10
   initialBackgroundX: -70
   planetChunkPrefabs:
   - {fileID: 1794519424926064, guid: 82272965e7af649a28c91a856db16f37, type: 2}
@@ -19102,6 +19102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb1ef86a713743c5b484371a56b31d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sessionSeed: 0
   touchControls: 0
   score: 0
   playedCutscene: 0

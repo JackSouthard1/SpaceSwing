@@ -207,9 +207,9 @@ public class TerrainManager : MonoBehaviour {
 //		print ("Getting Chunks of index " + startingIndex + " to " + (startingIndex + chunksPerTeir - 1));	
 
 		int random = Random.Range (0, levelChunksOfTeir.Count);
-		while (random == lastChunkID) {
-			random = Random.Range (0, levelChunksOfTeir.Count);
-		}
+//		while (random == lastChunkID) {
+//			random = Random.Range (0, levelChunksOfTeir.Count);
+//		}
 		lastChunkID = random;
 
 		return levelChunksOfTeir [random];
