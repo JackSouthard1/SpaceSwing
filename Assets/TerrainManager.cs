@@ -11,6 +11,12 @@ public class TerrainManager : MonoBehaviour {
 	public List<LevelChunk> allLevelChunks;
 	public List<GameObject> activeObjects = new List<GameObject>();
 
+	[Header("Teirs")]
+	public float dstPerTeir;
+	public int chunksPerTeir;
+	int teir = 0;
+	int maxTeir;
+
 	[Header("Stars")]
 	public GameObject starPrefab;
 	public float starParalaxScale;
@@ -46,13 +52,24 @@ public class TerrainManager : MonoBehaviour {
 	void Start () {
 		player = GameObject.Find ("Player").transform;
 
+		SetSeed (GameObject.Find ("GameManager").GetComponent<GameManager> ().sessionSeed);
+
+		maxTeir = Mathf.FloorToInt (allLevelChunks.Count / chunksPerTeir);
+
 		// spawn initial chunks
 		ResetTerrain();
 	}
-	
+		
 	void Update () {
 		if (player.transform.position.x > farthestX) {
 			farthestX = player.transform.position.x;
+
+			if (teir < maxTeir) {
+				if (farthestX > (teir + 1) * dstPerTeir) {
+					teir++;
+//					print ("Increasing difficutly to teir " + teir);
+				}
+			}
 
 			if (spawnTerrain) {
 				if (farthestX + objectSpawnBuffer > curChunkX) {
@@ -163,12 +180,8 @@ public class TerrainManager : MonoBehaviour {
 	}
 
 	void ExpressNextChunk () {
-		int random = Random.Range (0, allLevelChunks.Count);
-		while (random == lastChunkID) {
-			random = Random.Range (0, allLevelChunks.Count);
-		}
-		LevelChunk chunk = allLevelChunks [random];
-		lastChunkID = random;
+		int chunkTeir = Random.Range (0, teir + 1);
+		LevelChunk chunk = GetChunkOfTeir (chunkTeir);
 
 		foreach (var levelObject in chunk.levelObjects) {
 			Vector3 spawnPos = new Vector3 (levelObject.pos.x + curChunkX, levelObject.pos.y, 1f);
@@ -178,6 +191,28 @@ public class TerrainManager : MonoBehaviour {
 
 		curChunkX += chunk.chunkSize;
 
+	}
+
+	LevelChunk GetChunkOfTeir (int teir) {
+		List<LevelChunk> levelChunksOfTeir = new List<LevelChunk> ();
+		int startingIndex = teir * chunksPerTeir;
+		for (int i = startingIndex; i < startingIndex + chunksPerTeir; i++) {
+			if (i >= allLevelChunks.Count) {
+				i = allLevelChunks.Count - 1;
+			}
+//			print ("Got: " + i);
+
+			levelChunksOfTeir.Add (allLevelChunks [i]);
+		}
+//		print ("Getting Chunks of index " + startingIndex + " to " + (startingIndex + chunksPerTeir - 1));	
+
+		int random = Random.Range (0, levelChunksOfTeir.Count);
+		while (random == lastChunkID) {
+			random = Random.Range (0, levelChunksOfTeir.Count);
+		}
+		lastChunkID = random;
+
+		return levelChunksOfTeir [random];
 	}
 
 	void TestForObjectDespawns () {
@@ -196,6 +231,10 @@ public class TerrainManager : MonoBehaviour {
 
 		}
 			
+	}
+
+	void SetSeed (int _seed) {
+		Random.InitState (_seed);
 	}
 
 	void ClearObjects () {

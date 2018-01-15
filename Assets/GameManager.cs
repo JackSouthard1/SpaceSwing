@@ -7,6 +7,9 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 	static GameManager instance;
 
+//	[HideInInspector]
+	public int sessionSeed;
+
 	public bool touchControls;
 
 	[HideInInspector]
@@ -59,6 +62,8 @@ public class GameManager : MonoBehaviour {
 		// fps
 		QualitySettings.vSyncCount = 0;
 		Application.targetFrameRate = 60;
+
+		sessionSeed = System.Environment.TickCount;
 	}
 
 	void Start () {

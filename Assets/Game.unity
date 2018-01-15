@@ -7508,6 +7508,8 @@ MonoBehaviour:
     - pos: {x: 63, y: 19}
       prefab: {fileID: 1273512887774060, guid: 7dca139936adb467aaf7b4e11bee0102, type: 2}
   activeObjects: []
+  dstPerTeir: 200
+  chunksPerTeir: 2
   starPrefab: {fileID: 1827894580059554, guid: 7d8c178f5044a437e85a8ffd712c57e8, type: 2}
   starParalaxScale: 0.9
   starSpawnIntervals: 1
