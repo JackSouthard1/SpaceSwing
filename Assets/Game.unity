@@ -7513,6 +7513,17 @@ MonoBehaviour:
   starSpawnIntervals: 1
   initialStarCount: 200
   initialStarX: -70
+  backgroundSprites:
+  - {fileID: 21300000, guid: 86dbf6cca0a754a53bdb5e7836601690, type: 3}
+  - {fileID: 21300000, guid: e83ec8d63b5684b40a457e5cd0f1b5b8, type: 3}
+  - {fileID: 21300000, guid: 4910ce7b5c723419cb414bb8e3a93fb3, type: 3}
+  - {fileID: 21300000, guid: 2607bcd2b21ee450595241b44e3dc135, type: 3}
+  backgroundPrefab: {fileID: 1835333036997854, guid: 42ee24d885c784193852f8bd3a7bd929,
+    type: 2}
+  backgroundParalaxScale: 0.5
+  backgroundSpawnIntervals: 40
+  initialBackgroundCount: 5
+  initialBackgroundX: -70
   planetChunkPrefabs:
   - {fileID: 1794519424926064, guid: 82272965e7af649a28c91a856db16f37, type: 2}
   - {fileID: 1658908549787922, guid: 3c672a2349d024c6387b17ddbafc7bef, type: 2}

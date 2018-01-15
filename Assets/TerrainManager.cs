@@ -19,6 +19,15 @@ public class TerrainManager : MonoBehaviour {
 	public float initialStarX;
 	Transform lastStar = null;
 
+	[Header("Background Objects")]
+	public Sprite[] backgroundSprites;
+	public GameObject backgroundPrefab;
+	public float backgroundParalaxScale;
+	public float backgroundSpawnIntervals;
+	public float initialBackgroundCount;
+	public float initialBackgroundX;
+	Transform lastBackground = null;
+
 	[Header("Planet Chunks")]
 	public GameObject[] planetChunkPrefabs;
 	public float planetChunkY;
@@ -57,6 +66,12 @@ public class TerrainManager : MonoBehaviour {
 				CreateNextStar ();
 			}
 
+			if (lastBackground == null) {
+				CreateNextBackground ();
+			} else if (farthestX + objectSpawnBuffer > lastBackground.position.x) {
+				CreateNextBackground ();
+			}
+
 			if (lastPlanetChunk == null) {
 				CreateNextPlanetChunk ();
 			} else if (farthestX + objectSpawnBuffer > lastPlanetChunk.position.x) {
@@ -71,6 +86,7 @@ public class TerrainManager : MonoBehaviour {
 		ClearObjects ();
 
 		initialStarX += player.position.x;
+		initialBackgroundX += player.position.x;
 		initialPlanetChunkX += player.position.x;
 
 		farthestX = 0f;
@@ -84,6 +100,10 @@ public class TerrainManager : MonoBehaviour {
 
 		for (int i = 0; i < initialStarCount; i++) {
 			CreateNextStar ();
+		}
+
+		for (int i = 0; i < initialBackgroundCount; i++) {
+			CreateNextBackground ();
 		}
 
 		for (int i = 0; i < initialPlanetChunkCount; i++) {
@@ -104,6 +124,23 @@ public class TerrainManager : MonoBehaviour {
 
 		activeObjects.Add (star);
 	}
+
+	void CreateNextBackground () {
+		Vector3 spawnPos;
+		if (lastBackground == null) {
+			spawnPos = new Vector3 (initialBackgroundX, Random.Range (-35, 25), 5f);
+		} else {
+			spawnPos = new Vector3 (lastBackground.position.x + backgroundSpawnIntervals, Random.Range (-35, 25), 5f);
+		}
+		GameObject background = (GameObject)Instantiate (backgroundPrefab, spawnPos, Quaternion.identity, transform);
+		background.GetComponent<Paralax> ().Init (spawnPos, backgroundParalaxScale);
+		lastBackground = background.transform;
+
+		Sprite sprite = backgroundSprites [Random.Range (0, backgroundSprites.Length)];
+		background.GetComponent<SpriteRenderer> ().sprite = sprite;
+
+		activeObjects.Add (background);
+	} 
 
 	void CreateNextPlanetChunk () {
 		Vector3 spawnPos;
