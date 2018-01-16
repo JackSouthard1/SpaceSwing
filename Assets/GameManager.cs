@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour {
 	public float fuelGuageAppearDelay;
 	public float policeStartOffset;
 
+	// audio
+	[Header("Audio")]
+	public AudioSource menuAudio;
+	public AudioSource gameAudio;
+
 	[HideInInspector]
 	public float playerShipStartOffset;
 
@@ -116,6 +121,13 @@ public class GameManager : MonoBehaviour {
 		if (scoreText == null) {
 			scoreText = GameObject.Find ("Canvas").transform.Find ("Score").GetComponent<Text> ();
 		}
+
+		// audio
+		if (menuAudio.isPlaying) {
+			menuAudio.Stop ();
+			gameAudio.Play ();
+		}
+
 		scoreText.enabled = true;
 		paused = false;
 		pc.Unpause ();
@@ -136,6 +148,10 @@ public class GameManager : MonoBehaviour {
 		cutsceneExit.Play ();
 		pc.ExitCutscene ();
 		police.ExitCutScene();
+
+		// audio
+		menuAudio.Stop();
+		gameAudio.Play ();
 
 		scoreText.enabled = true;
 		inCutscene = false;

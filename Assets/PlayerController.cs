@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D rb;
 	private Transform sprite;
 	private ParticleSystem[] engines;
+	private AudioSource engineAudio;
 
 	public float breakSpeed;
 
@@ -79,7 +80,7 @@ public class PlayerController : MonoBehaviour {
 			rb.gravityScale = 0f;
 		}
 
-
+		engineAudio = GetComponent<AudioSource> ();
 		engines = GetComponentsInChildren<ParticleSystem> ();
 		foreach (var engine in engines) {
 			engine.Stop ();
@@ -304,6 +305,8 @@ public class PlayerController : MonoBehaviour {
 	public void StartBoost () {
 		if (boostTimeRemaining > 0) {
 			boosting = true;
+
+			engineAudio.Play ();
 			foreach (var engine in engines) {
 				engine.Play ();
 			}
@@ -312,6 +315,8 @@ public class PlayerController : MonoBehaviour {
 
 	void EndBoost () {
 		boosting = false;
+
+		engineAudio.Stop();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
@@ -431,6 +436,7 @@ public class PlayerController : MonoBehaviour {
 		if (Time.time < 0.5f) {
 			return;
 		}
+		engineAudio.Stop ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
@@ -450,6 +456,7 @@ public class PlayerController : MonoBehaviour {
 
 		transform.position = new Vector3 (-gm.playerShipStartOffset, 0f, 0f);
 
+		engineAudio.Play ();
 		foreach (var engine in engines) {
 			engine.Play ();
 		}
@@ -472,6 +479,7 @@ public class PlayerController : MonoBehaviour {
 		hookIndicator.SetActive (true);
 
 		rb.gravityScale = 3f;
+		engineAudio.Stop ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
@@ -501,25 +509,30 @@ public class PlayerController : MonoBehaviour {
 
 	IEnumerator ToggleEngines () {
 		for (int i = 0; i < 2; i++) {
+			engineAudio.Stop ();
 			foreach (var engine in engines) {
 				engine.Stop ();
 			}
 			yield return new WaitForSeconds(0.45f);
+			engineAudio.Play ();
 			foreach (var engine in engines) {
 				engine.Play ();
 			}
 			yield return new WaitForSeconds(0.2f);
 		}
 		for (int i = 0; i < 3; i++) {
+			engineAudio.Stop ();
 			foreach (var engine in engines) {
 				engine.Stop ();
 			}
 			yield return new WaitForSeconds(0.25f);
+			engineAudio.Play ();
 			foreach (var engine in engines) {
 				engine.Play ();
 			}
 			yield return new WaitForSeconds(0.1f);
 		}
+		engineAudio.Stop ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}

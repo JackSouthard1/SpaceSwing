@@ -7,6 +7,7 @@ public class Ship : MonoBehaviour {
 	private PlayerController pc;
 	private TerrainManager tm;
 	private ParticleSystem[] engines;
+	private AudioSource engineAudio;
 
 	bool hooked = false;
 
@@ -30,6 +31,7 @@ public class Ship : MonoBehaviour {
 		pc = GameObject.Find ("Player").GetComponent<PlayerController> ();
 		rb = GetComponent<Rigidbody2D> ();
 
+		engineAudio = GetComponent<AudioSource> ();
 		if (transform.Find ("Engines").childCount > 0) {
 			engines = transform.Find ("Engines").GetComponentsInChildren<ParticleSystem> ();
 		}
@@ -95,6 +97,7 @@ public class Ship : MonoBehaviour {
 
 	public void HookStart () {
 		hooked = true;
+		engineAudio.Play ();
 		foreach (var engine in engines) {
 			engine.Play ();
 		}
@@ -102,6 +105,7 @@ public class Ship : MonoBehaviour {
 
 	public void HookStop () {
 		hooked = false;
+		engineAudio.Stop ();
 		foreach (var engine in engines) {
 			engine.Stop ();
 		}
